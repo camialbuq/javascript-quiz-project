@@ -49,13 +49,26 @@ class Quiz {
   //       [this.choices[i], this.choices[j]] = [this.choices[j], this.choices[i]]; // Swap elements at i and j
   //     }
 
+  // //shuffle solution provided with "temporary" item
+  // shuffleQuestions() {
+  //   if (!this.questions.length) {
+  //     return undefined;
+  //   }
+  //   for (let i = 0; i < this.questions.length; i++) {
+  //     const randomIndex = Math.floor(Math.random() * (i + 1));
+
+  //     const temp = this.questions[i];
+  //     this.questions[i] = this.questions[randomIndex];
+  //     this.questions[randomIndex] = temp;
+  //   }
+  // }
+
   // 5. checkAnswer(answer)
   //user has made a selection and we will verify if true
   checkAnswer(answer) {
-    //if the answer to this question[current index i] is equal to the question.answer value
-    if (answer === this.questions[this.currentQuestionIndex].answer)
-      //then increase the count of correctAnswers by 1
+    if (answer === this.getQuestion().answer) {
       this.correctAnswers++;
+    }
   }
 
   //** remember this is how a question is built */
@@ -86,7 +99,7 @@ class Quiz {
   // should not change the 'questions' array if the 1st argument is not a number between 1 and 3
 
   filterQuestionsByDifficulty(difficulty) {
-    if (difficulty > 1 && difficulty <= 3) {
+    if (difficulty > 1 && difficulty <= 3 && typeof difficulty === "number") {
       //for each question inside of the questions array
       //filter those which difficulty equals to the difficulty selected
       this.questions = this.questions.filter(
@@ -102,23 +115,7 @@ class Quiz {
     const totalDifficulties = this.questions.reduce((acc, curr) => {
       return acc + curr.difficulty;
     }, 0);
-    return totalDifficulties / this.questions.length;
+    const averageDifficulty = totalDifficulties / this.questions.length;
+    return averageDifficulty;
   }
 }
-
-//example reduce from class 04.04.24
-const menu = [
-  { name: "Carrots", calories: 150 },
-  { name: "Steak", calories: 350 },
-  { name: "Broccoli", calories: 120 },
-  { name: "Chicken", calories: 250 },
-  { name: "Pizza", calories: 520 },
-];
-//calculate the average number of calories for the entire list.
-// your code:
-const averageCalories = menu.reduce((acc, curr) => {
-  return acc + curr.calories; //the reduce needs to finish accumulating
-}, 0); //so we cannot do the average here
-//therefore we will do average after we accumulate, when we console.log
-
-console.log(averageCalories / menu.length); // 278
