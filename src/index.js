@@ -105,10 +105,78 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Show first question
   showQuestion();
+  //this is hoisted, only declared before.
 
   /************  TIMER  ************/
 
-  let timer;
+  //interaction on Day04 - 08.04.24
+  //The timer should start when the quiz starts and stop when the quiz ends.
+  // When quiz starts then timer should:
+  // Start counting down from the time specified in the timeRemaining property of the Quiz instance. (quiz.timeRemaining)
+  // Update the timeRemaining and the timer text every second
+  // Stop counting down when the time is up
+  // When the time is up, it should display the end view and the score
+
+  // from class this is the timer example:
+  // let timeoutID = null;
+  // let seconds = 0;
+  // timeoutID = setInterval(()=>{
+  //   root.innerHTML = seconds; //where we display this on screen
+  //   seconds++;
+  //   // if (seconds > 5) {
+  //   //   clearInterval(timeoutID)
+  //   // }
+  // }, 1000)
+
+  // const root = document.getElementById("root");
+  // const timerButton = document.getElementById("timer-button");
+  // timerButton.addEventListener("click", () => {
+  //   clearInterval(timeoutID);
+  // })
+
+  // prev defined:  const seconds = (quiz.timeRemaining % 60).toString().padStart(2, "0");
+  // prev defined: const minutes = Math.floor(remainingTime / 60).toString().padStart(2, "0");
+  // prev defined:
+  // // Display the time remaining in the time remaining container
+  // // const timeRemainingContainer = document.getElementById("timeRemaining");
+  // // timeRemainingContainer.innerText = `${minutes}:${seconds}`;
+
+  function countDown(remainingTime) {
+    let timer = setInterval(() => {
+      //we dont need to do this:
+      // if (seconds < 0) {
+      //   //   minutes--
+      //   // }
+      // because minutes and seconds are already automatically calculated
+      // based on "remainingTIme", which in our case is the function passed argument (quiz.timeRemaining)
+      const minutes = Math.floor(remainingTime / 60)
+        .toString()
+        .padStart(2, "0");
+      const seconds = (remainingTime % 60).toString().padStart(2, "0");
+      const timeRemainingContainer = document.getElementById("timeRemaining");
+      timeRemainingContainer.innerText = `${minutes}:${seconds}`;
+      remainingTime--;
+
+      if (remainingTime < 0) {
+        clearInterval(timer);
+        showResults();
+      }
+    }, 1000);
+  }
+  countDown(quiz.timeRemaining);
+
+  //   // Convert the time remaining in seconds to minutes and seconds, and pad the numbers with zeros if needed
+  //     const minutes = Math.floor(quiz.timeRemaining / 60)
+  //     .toString()
+  //     .padStart(2, "0");
+  //   //this will convert dividing by 60 seconds
+  //   // pads the beginning of a string with the specified fill character. The character will be used to meet the overall length specified by the first argument given.
+  //   // it starts in two minutes and counts below
+  //   const seconds = (quiz.timeRemaining % 60).toString().padStart(2, "0");
+
+  //  // Display the time remaining in the time remaining container
+  //  const timeRemainingContainer = document.getElementById("timeRemaining");
+  //  timeRemainingContainer.innerText = `${minutes}:${seconds}`;
 
   /************  EVENT LISTENERS  ************/
 
@@ -123,6 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function showQuestion() {
     // If the quiz has ended, show the results
     if (quiz.hasEnded()) {
+      //this method hasEnded is defined in the quiz.js file
       showResults();
       return;
     }
@@ -158,6 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //currentQuestionIndex comes from Quiz file and we pushed the count there
     //starts in 0 and we we use moveToNextQuestion() then increases
+    //index is = 0, but we wanna show "question 1" therefore +1
     const questionCountText = `Question ${quiz.currentQuestionIndex + 1} of ${
       quiz.questions.length
     }`;
@@ -204,12 +274,14 @@ document.addEventListener("DOMContentLoaded", () => {
       // Hint 2: You can use the `element.type`, `element.name`, and `element.value` properties to set the type, name, and value of an element.
       radio.type = "radio";
       radio.name = "choice";
-      radio.value = choice;
+      radio.value = choice; //the radio value is directly the choice, not a string
+
       // Hint 3: You can use the `element.appendChild()` method to append an element to the choices container.
       //the choicesContainer was previously defined with query selector : const choiceContainer = document.querySelector("#choices");
       choiceContainer.appendChild(radio);
 
       // Hint 4: You can use the `element.innerText` property to set the inner text of an element.
+      //the label is what will be actually shown for us to see as the choice options
       const radiolabel = document.createElement("label");
       //meaning we will take the variable "choice" and use it as the text from the radio label
       radiolabel.innerText = choice;
@@ -231,15 +303,18 @@ document.addEventListener("DOMContentLoaded", () => {
     //  When a radio input gets selected the `.checked` property will be set to true.
     //  You can use check which choice was selected by checking if the `.checked` property is true.
 
+    //in order to understand which choice was selected
     let selectedAnswer; // A variable to store the selected answer value
     const choices = document.querySelectorAll("input[name=choice]");
 
     //this checkes if one of the radio input was selected, then property choice = true
     choices.forEach((choice) => {
       if (choice.checked) {
+        //special attribute in radio buttons checked true or false
         selectedAnswer = choice.value;
       }
     });
+
     // 3. If an answer is selected (`selectedAnswer`), check if it is correct and move to the next question
     // Check if selected answer is correct by calling the quiz method `checkAnswer()` with the selected answer.
     // Move to the next question by calling the quiz method `moveToNextQuestion()`.
@@ -267,19 +342,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 3. Update the result container (div#result) inner text to show the number of correct answers out of total questions
     resultContainer.innerText = `You scored ${quiz.correctAnswers} out of ${quiz.questions.length} correct answers!`; // This value is hardcoded as a placeholder
+
+    //make sure time is stopped running in the background:
+    clearInterval(timer);
   }
 
   // resetButtonHandler()
   const resetButton = document.querySelector("#restartButton");
   // console.log(resetButton);
   resetButton.addEventListener("click", () => {
-    endView.style.display = "none";
-    quizView.style.display = "block";
+    endView.style.display = "none"; //again hiding results
+    quizView.style.display = "block"; //showing back the quizview
     //once reseted go back to index 0
-    quiz.currentQuestionIndex = 0;
+    quiz.currentQuestionIndex = 0; //need to reassing to the beginning question
     quiz.correctAnswers = 0;
-    quiz.shuffleQuestions();
+
+    //added in iteraction day 04:
+    // Reset the timeRemaining property of the Quiz instance to the initial value
+    quiz.timeRemaining = quizDuration; //which was initially set to 120
+    // Update the timer text in the quiz view to the initial value
+    timeRemainingContainer.innerText = `${minutes}:${seconds}`;
+    quiz.shuffleQuestions(); //so that we dont show in the same order as we just played
     //go back to display a question
-    showQuestion();
+    showQuestion(); //display first question
+
+    // Start the timer countdown again
+    countDown(quiz.timeRemaining);
   });
 });

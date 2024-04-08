@@ -25,7 +25,7 @@ header {
 
 .container {
   height: 70%;
-  max-width: 70%;
+  max-width: 80%;
   margin: auto;
   padding: 20px;
   background: #fff;
@@ -54,7 +54,7 @@ header {
   -webkit-text-fill-color: transparent; */
   color: #e97c68;
   text-align: center;
-  text-shadow: 2px 1px 1px #7d4035;
+  text-shadow: 1px 3px 1px #7d4035;
   /* offset-x | offset-y | blur-radius | color
 text-shadow: 1px 1px 2px black; */
   line-height: 100%;
